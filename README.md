@@ -1,6 +1,6 @@
-# dedication
-CivEx Dedication Plugin
+# Dedication
+Lightweight Dedication Plugin
 
-# Deprecated
+Configurable targets that must be achieved before a player can fully interact with the game world.
 
-Development on this plugin has been halted in favor of a more user friendly and sophisticated system.
+Minimally maintained but functional.

@@ -25,9 +25,13 @@ import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.scheduler.BukkitTask;
 
 /**
  *
@@ -46,6 +50,7 @@ public class Dedication extends JavaPlugin {
     private LoginLogoutListener lll;
     private PvPListener pvp;
     private Backend backend;
+    private BukkitTask dedicationUpdater;
     private final Map<UUID, PlayerData> playerdata = new HashMap<>();
 
     @Override
@@ -70,6 +75,13 @@ public class Dedication extends JavaPlugin {
         pvp = new PvPListener();
 
         registerListener(bbl, bpl, el, lll, pvp);
+        
+        dedicationUpdater = (new BukkitRunnable() {
+        	@Override
+        	public void run() {
+        		lll.updateAll();
+        	}
+        }).runTaskTimer(this, 1200l, 1200l);
 
         if (getServer()
                 .getPluginManager().getPlugin("Citadel") != null) {
@@ -94,6 +106,9 @@ public class Dedication extends JavaPlugin {
 
     @Override
     public void onDisable() {
+    	if (dedicationUpdater != null) {
+    		dedicationUpdater.cancel();
+    	}
         for (UUID uuid : playerdata.keySet()) {
             savePlayer(uuid);
         }
@@ -168,7 +183,7 @@ public class Dedication extends JavaPlugin {
                     instance.lll.addTarget((TimeTarget) t);
                     break;
                 default:
-                    logger().log(Level.WARNING, "Unkown target type: {0}", t.getType());
+                    logger().log(Level.WARNING, "Unknown target type: {0}", t.getType());
             }
         }
         if (data.isAdminOverride()) {

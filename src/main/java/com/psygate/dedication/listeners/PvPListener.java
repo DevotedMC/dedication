@@ -19,6 +19,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.LingeringPotionSplashEvent;
 import org.bukkit.event.entity.PotionSplashEvent;
 import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.metadata.MetadataValue;
@@ -96,6 +97,20 @@ public class PvPListener implements Listener {
                 ev.getAffectedEntities().clear();
             }
         }
+    }
+    
+    @EventHandler(ignoreCancelled = true, priority = EventPriority.LOWEST)
+    public void onLingerPotionSplash(LingeringPotionSplashEvent ev) {
+        ProjectileSource source = ev.getEntity().getShooter();
+//      Dedication.logger().log(Level.INFO, "Spawned {0} by {1}", new Object[]{ev.getEntityType(), source});
+
+      if (source instanceof Player) {
+          Player player = (Player) source;
+          PlayerData data = Dedication.initPlayer(player.getUniqueId());
+          if (!data.isDedicated()) {
+              ev.setCancelled(true);
+          }
+      }    	
     }
 
     private void subProcessEvent(EntityDamageByEntityEvent event, Player victim, Player attacker) {

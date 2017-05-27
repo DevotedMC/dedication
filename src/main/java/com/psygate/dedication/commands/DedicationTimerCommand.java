@@ -25,7 +25,7 @@ public class DedicationTimerCommand implements CommandExecutor {
     @Override
     public boolean onCommand(CommandSender cs, Command cmnd, String string, String[] strings) {
         if (strings.length > 0 && !cs.hasPermission("dedication.admin.seeothers")) {
-            cs.sendMessage(Dedication.PREFIX + ChatColor.RED + "You cannot see the dedication of others. This incident will be logged.");
+            cs.sendMessage(Dedication.PREFIX + ChatColor.RED + "You cannot see the dedication of others.");
             cs.sendMessage(Dedication.PREFIX + ChatColor.RED + "To see your own dedication, issue this command without arguments.");
             Dedication.logger().severe(cs.getName() + " tried to see the dedication status of a different player, but lacks permission.");
             return true;
@@ -69,25 +69,30 @@ public class DedicationTimerCommand implements CommandExecutor {
 
             PlayerData data = Dedication.initPlayer(p.getUniqueId());
 
-            long numericTarget = 0;
-            long numericDone = 0;
+            double avgSum = 0d;
+            double cnt = 0d;
 
             for (Target t : data.getTargets()) {
                 if (t instanceof NumericTarget) {
                     NumericTarget num = (NumericTarget) t;
-                    numericTarget += num.getTarget();
-                    numericDone += num.getValue();
+                    if (num.getTarget() > 0) {
+                    	double lavg = (double) num.getValue() / (double) num.getTarget();
+                    	avgSum += (lavg > 1.0 ? 1.0 : lavg);
+                    	cnt ++;
+                    }
                 } else {
                     Dedication.logger().log(Level.WARNING, "No rule for: {0}", t.getClass());
                 }
             }
 
             cs.sendMessage("Status: " + ((data.isDedicated()) ? ChatColor.GREEN + "DEDICATED" : ChatColor.RED + "NOT DEDICATED."));
-            if (numericTarget == 0) {
+            if (avgSum == 0d) {
                 cs.sendMessage(Dedication.PREFIX + "Progress: 0%");
+            } else if (cnt == 0d) {
+            	cs.sendMessage(Dedication.PREFIX + "Progress: Unknown");
             } else {
-                int perc = (int) (((double) numericDone / (double) numericTarget) * 100);
-                cs.sendMessage(Dedication.PREFIX + " Progress: " + ((perc > 100) ? 100 : perc) + "%");
+                int perc = (int) Math.round((avgSum / cnt)* 100d);
+                cs.sendMessage(Dedication.PREFIX + " Progress: " + perc + "%");
             }
         }
     }
