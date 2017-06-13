@@ -7,6 +7,8 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
+
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.util.ChatPaginator;
@@ -77,14 +79,12 @@ public class PlayerData implements Serializable {
 
     public boolean isDedicated() {
         if (adminOverride) {
-//            Dedication.logger().info("Satisfied by admin override.");
-
             return true;
         }
 
-        Player pl = Dedication.getPlugin(Dedication.class).getServer().getPlayer(player);
+        Player pl = Bukkit.getPlayer(player);
 
-        if (pl.hasPermission("dedication.bypass")) {
+        if (pl != null && pl.hasPermission("dedication.bypass")) { // nullcheck, no guarantee of return.
             return true;
         }
 
