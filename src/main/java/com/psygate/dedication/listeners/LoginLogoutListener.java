@@ -11,6 +11,7 @@ import java.util.Set;
 import java.util.UUID;
 import org.bukkit.Achievement;
 import org.bukkit.Bukkit;
+import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -32,7 +33,11 @@ public class LoginLogoutListener implements Listener {
 	public void onLogin(PlayerJoinEvent ev) {
 		PlayerData data = Dedication.initPlayer(ev.getPlayer().getUniqueId());
 		if (data.isDedicated()) {
-			ev.getPlayer().awardAchievement(Achievement.END_PORTAL);
+			try {
+				ev.getPlayer().awardAchievement(Achievement.END_PORTAL);
+			} catch (UnsupportedOperationException e) {
+				ev.getPlayer().playSound(ev.getPlayer().getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 1.0f, 1.0f);
+			}
 			ev.getPlayer().sendMessage("You have earned dedicated status.");
 		}
 		loginTimes.put(ev.getPlayer().getUniqueId(), System.currentTimeMillis());
@@ -60,7 +65,11 @@ public class LoginLogoutListener implements Listener {
 			onUpdate(player.getUniqueId());
 			
 			if (data.isDedicated()) {
-				player.awardAchievement(Achievement.END_PORTAL);
+				try {
+					player.awardAchievement(Achievement.END_PORTAL);
+				} catch (UnsupportedOperationException e) {
+					player.playSound(player.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 1.0f, 1.0f);
+				}
 				player.sendMessage("You have earned dedicated status.");
 			}
 		}
