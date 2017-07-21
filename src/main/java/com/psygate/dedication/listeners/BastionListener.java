@@ -43,11 +43,8 @@ public class BastionListener implements Listener
         blocks.add(event.getBlock());
 
         //See if there are any bastions covering this location that the player is not on the groups for
-        Set blocking = bastionManager.shouldStopBlock(null, blocks, event.getPlayer().getUniqueId());
+        Set blocking = bastionManager.shouldStopBlockByBlockingBastion(null, blocks, event.getPlayer().getUniqueId());
         
-        //Clear out bastions that can only be directly destroyed
-        blocking = BastionDamageListener.clearNonBlocking(blocking);
-
         //We have already determined the player is not dedicated, so if there are blocking bastions
         //we cancel the event.
         if (blocking.size() != 0)
